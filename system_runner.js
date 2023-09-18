@@ -40,9 +40,11 @@ function songLoadedSoFar(soFar) {
   print(songButton.elt.innerHTML);
 }
 
+let sticker;
 function preload() {
   table = loadTable('volumes.csv', 'csv');
   words = loadStrings('words.txt');
+  sticker = loadImage('img/Parental-Advisory-logo.png');
 }
 
 let volumes = [];
@@ -54,7 +56,7 @@ function setup() {
   song = loadSound('song.mp3', songLoaded, songLoadedError, songLoadedSoFar);  
   
   frameRate(60);
-  angleMode(DEGREES);
+  // angleMode(DEGREES);
 
   // create text inputs
   textInput = createInput('words...');
