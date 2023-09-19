@@ -2,6 +2,7 @@
 let firstFrame = true;
 const stars = [];
 const flames = [];
+const asteroids = [];
 const maxStarSize = 30;
 let rocketAngle = 0;
 
@@ -10,8 +11,8 @@ class Star {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.changeSize = Math.random() > 0.5;
-    this.framesSinceChange = Math.random() * 120;
+    this.changeSize = Math.random() > 0.8;
+    this.framesSinceChange = Math.random() * 400;
   }
   draw() {
     fill(255, 255, 255, 255);
@@ -21,23 +22,27 @@ class Star {
     fill(255, 255, 255, 255);
     stroke(0, 0, 0, 40);
 
-    if(this.framesSinceChange > 120){
+    // if(this.framesSinceChange <= 0){
     
-        if(sizeMod > 0.4 && Math.random() > 0.8 && !this.changeSize){
-          this.changeSize = true;
-          this.framesSinceChange = 0;
-        } else if (sizeMod < 0.25 && Math.random() > 0.4 && this.changeSize){
-          this.changeSize = false;
-          this.framesSinceChange = 0;
-        }
+    //     if(sizeMod > 0.3 && Math.random() > 0.5 && !this.changeSize){
+    //       this.changeSize = true;
+    //       this.framesSinceChange = 60;
+    //     } else if (sizeMod < 0.3 && Math.random() > 0.4 && this.changeSize){
+    //       this.changeSize = false;
+    //       this.framesSinceChange = 400;
+    //     }
       
+    // }
+    this.framesSinceChange--;
+    if(this.framesSinceChange <= 0){
+      this.changeSize = !this.changeSize;
+      this.framesSinceChange = random(60, 400);
     }
-    this.framesSinceChange++;
 
     if(this.changeSize){
       star(this.x, this.y, this.size * sizeMod, this.size * sizeMod * 0.25, points);
     } else {
-      star(this.x, this.y, this.size * 0.2, this.size * 0.05, points);
+      star(this.x, this.y, this.size * 0.4, this.size * 0.1, points);
     }
   }
 
