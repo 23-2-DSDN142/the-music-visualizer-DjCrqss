@@ -41,10 +41,12 @@ function songLoadedSoFar(soFar) {
 }
 
 let sticker;
+let rocketship;
 function preload() {
   table = loadTable('volumes.csv', 'csv');
   words = loadStrings('words.txt');
   sticker = loadImage('img/Parental-Advisory-logo.png');
+  rocketship = loadImage('img/rocketship.png');
 }
 
 let volumes = [];

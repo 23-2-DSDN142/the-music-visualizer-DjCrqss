@@ -8,6 +8,8 @@ class Star {
     this.x = x;
     this.y = y;
     this.size = size;
+    this.changeSize = Math.random() > 0.5;
+    this.framesSinceChange = Math.random() * 120;
   }
   draw() {
     fill(255, 255, 255, 255);
@@ -16,7 +18,27 @@ class Star {
   drawSized(sizeMod, points) {
     fill(255, 255, 255, 255);
     stroke(0, 0, 0, 40);
-    star(this.x, this.y, this.size * sizeMod, this.size * sizeMod * 0.25, points);
+
+    console.log(sizeMod);
+
+    if(this.framesSinceChange > 120){
+    
+        if(sizeMod > 0.4 && Math.random() > 0.8 && !this.changeSize){
+          this.changeSize = true;
+          this.framesSinceChange = 0;
+        } else if (sizeMod < 0.25 && Math.random() > 0.4 && this.changeSize){
+          this.changeSize = false;
+          this.framesSinceChange = 0;
+        }
+      
+    }
+    this.framesSinceChange++;
+
+    if(this.changeSize){
+      star(this.x, this.y, this.size * sizeMod, this.size * sizeMod * 0.25, points);
+    } else {
+      star(this.x, this.y, this.size * 0.2, this.size * 0.05, points);
+    }
   }
 
   move() {
@@ -49,7 +71,7 @@ function biasSmallRandom() {
 }
 
 function draw_one_frame(words, vocal, drum, bass, other, counter) {
-  background(0, 0, 0, 30);
+  background(0, 0, 0, 15);
   // setup items
   if (firstFrame) {
     setUp();
@@ -153,11 +175,16 @@ function drawPlanet(bass, counter) {
  */
 function drawShip(vocal) {
   // draw ship
+  let shakeX = random(-vocal * 0.008, vocal * 0.008);
+  let shakeY = random(-vocal * 0.008, vocal * 0.008);
+
+  image(rocketship, width * 0.5 - 50 + shakeX, height * 0.5 - 150 + shakeY, 200, 200);
 
   // draw ship glow
   push();
-  radialGradient(width / 2, height / 2, (vocal * 2) + 20, width / 2, height / 2, vocal * 4 + 250, color(0, 0, 0, 0), color(0, 0, 0, 250));
-  // radialGradient(width/2, height/2, (vocalValue*2)+100, width/2, height/2, vocalValue*4, color(0, 0, 0, 0), color(0, 0, 0, 250));
+  radialGradient(width / 2, height / 2, (vocal * 2), width / 2, height / 2, vocal * 4 + 175, color(0, 0, 0, 0), color(0, 0, 0, 250));
+  // radialGradient(width / 2, height / 2, (vocal * 2) + 20, width / 2, height / 2, vocal * 4 + 250, color(0, 0, 0, 0), color(0, 0, 0, 250));
+
   rect(0, 0, width, height);
   pop();
 }
