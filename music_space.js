@@ -1,7 +1,9 @@
 // create stars class
 let firstFrame = true;
 const stars = [];
+const flames = [];
 const maxStarSize = 30;
+let rocketAngle = 0;
 
 class Star {
   constructor(x, y, size) {
@@ -18,8 +20,6 @@ class Star {
   drawSized(sizeMod, points) {
     fill(255, 255, 255, 255);
     stroke(0, 0, 0, 40);
-
-    console.log(sizeMod);
 
     if(this.framesSinceChange > 120){
     
@@ -43,8 +43,10 @@ class Star {
 
   move() {
     let shift = this.size / 60;
-    this.x -= shift;
-    this.y += shift;
+    // convert rocketAngle to x and y shift
+
+    this.x -= sin(rocketAngle + PI/4) * shift;
+    this.y += cos(rocketAngle + PI/4) * shift;
     if (this.x < 0 || this.y > height) {
       if (random(1) > 0.5) {
         this.x = random(0, width * 0.9);
@@ -98,18 +100,18 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   drawPlanet(bass, counter);
 
 
+  // draw foreground stars
   stars.filter((star) => star.size >= maxStarSize * 0.66).forEach((star) => {
     star.drawSized(starSize, starPoints);
   });
 
-
   // draw ship and glow
-  drawShip(vocal);
+  drawShip(vocal, bass);
 
   // draw album cover items
   drawAlbumCovertItems();
 
-  // move stars
+  // update items
   stars.forEach((star) => {
     star.move();
   });
@@ -121,15 +123,16 @@ function setUp() {
   for (let i = 0; i < 100; i++) {
     // generate random size from 1 to maxStarSize but weighted towards smaller stars
     stars.push(new Star(random(width), random(height), biasSmallRandom() * maxStarSize));
+    flames.push(new Flame());
   }
 }
 
 
 function drawPlanet(bass, counter) {
   noStroke();
-  const planetSize = 120;
+  const planetSize = 190;
   push();
-  translate(width * 0.2, height * 0.7);
+  translate(width * 0.165, height * 0.75);
 
   // bottom layer
   push();
@@ -144,7 +147,7 @@ function drawPlanet(bass, counter) {
     rotate(sin(counter/300 - 2)/4);
     noFill();
     stroke(200);
-    strokeWeight(9);
+    strokeWeight(15);
     let bassAmount = bass/5;
     if(bass > 80){
       bassAmount += sin(counter)*5;
@@ -173,20 +176,46 @@ function drawPlanet(bass, counter) {
  * Visualises the vocal value
  * @param {number} vocalValue - the vocal value
  */
-function drawShip(vocal) {
+function drawShip(vocal, bass) {
   // draw ship
   let shakeX = random(-vocal * 0.008, vocal * 0.008);
   let shakeY = random(-vocal * 0.008, vocal * 0.008);
 
-  image(rocketship, width * 0.5 - 50 + shakeX, height * 0.5 - 150 + shakeY, 200, 200);
+  rocketAngle = -cos(frameCount/800) * 0.3;
+
+  
+  
+  // draw flames
+  push();
+  // translate(width * 0.5 + 25, height * 0.5 - 20);
+  translate(width * 0.5 + 80 + shakeX, height * 0.5 - 50 + shakeY);
+  rotate(TWO_PI*(5/8) + rocketAngle);
+  translate(0, -50);
+  flames.forEach(flame => {
+    flame.render(vocal || 0);
+  });
+  pop();
+  
+  
+  push();
+    translate(width * 0.5 + 80 + shakeX, height * 0.5 - 50 + shakeY);
+    rotate(rocketAngle);
+    imageMode(CENTER);
+    image(rocketship,0, 0, 200, 200);
+  pop();
 
   // draw ship glow
   push();
-  radialGradient(width / 2, height / 2, (vocal * 2), width / 2, height / 2, vocal * 4 + 175, color(0, 0, 0, 0), color(0, 0, 0, 250));
+  radialGradient(width / 2 + 80, height / 2, (vocal * 2), width / 2 + 80, height / 2, vocal * 4 + 110 + bass*2, color(0, 0, 0, 0), color(0, 0, 0, 250));
   // radialGradient(width / 2, height / 2, (vocal * 2) + 20, width / 2, height / 2, vocal * 4 + 250, color(0, 0, 0, 0), color(0, 0, 0, 250));
-
   rect(0, 0, width, height);
   pop();
+
+
+  
+  // flames.forEach((flame) => {
+  //   flame.move();
+  // });
 }
 
 /**
@@ -249,4 +278,62 @@ function linearGradient(sX, sY, eX, eY, colorS, colorE) {
   gradient.addColorStop(1, colorE);
   drawingContext.fillStyle = gradient;
   // drawingContext.strokeStyle = gradient;
+}
+
+
+
+const startLife = 7;
+const decayRate = 0.1;
+
+
+class Flame {
+  constructor() {
+    this.reset();
+    this.delay = random(startLife/decayRate);
+  }
+
+  reset(vocal) {
+    let vocalSpread = vocal/10 || 0;
+    this.startRadius = random(25, 30);
+    this.radius = this.startRadius;
+    this.pos = createVector((random(-vocalSpread, vocalSpread) -4), 0);
+    this.vel = createVector();
+    this.lightness = random(150, 255);
+    this.startAlpha = random(0, 5) + vocalSpread/5;
+    this.decayRate = 0.1;
+    this.startLife = 6;
+    this.opacity =  vocalSpread * 3;
+    this.life = this.startLife;
+  }
+
+  update(vocal) {
+    let vocalSpread = vocal * 40;
+    this.vel.x += (random(0, 200) - 100) / (200 + vocalSpread);
+    this.vel.y -= this.life / 50 + (Math.random()/10);
+    this.pos.add(this.vel);
+    this.radius = this.startRadius * (this.life / this.startLife);
+    this.life -= this.decayRate;
+    this.opacty -= this.decayRate;
+    if (this.life <= this.decayRate) {
+      this.reset(vocal);
+    }
+    return this;
+  }
+
+  display() {
+    push();
+    fill(this.lightness, this.lightness, this.lightness, Math.min(this.opacity * 5 + this.startAlpha, this.life*10));
+    noStroke();
+    ellipse(this.pos.x, this.pos.y, this.radius);
+    pop();
+    return this;
+  }
+
+  render(vocal) {
+    if(this.delay > 0){
+      this.delay--;
+      return;
+    }
+    return this.update(vocal).display();
+  }
 }
