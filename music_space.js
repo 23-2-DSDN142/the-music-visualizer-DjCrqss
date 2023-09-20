@@ -86,6 +86,8 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   }
 
 
+  setExtraSounds(counter);
+
 
   // draw stars
   let starSize = drum / 75;
@@ -133,7 +135,82 @@ function setUp() {
 }
 
 
+let word1opacity = 0;
+let word2opacity = 0;
+let word3opacity = 0;
+let enableTriplePing = true;
+let timeSincePing = 999;
+const triplePingEnable = [[80, 2100], [3200, 5200], [6400, 7400], [10600, 11500]];
+const metalPingEnable = [[2100, 4100], [5200, 7200], [8500, 9300]];
+function setExtraSounds(counter) {
+  // console.log(counter);
+  let triplePingDelay = 80;
+  let timeBetweenPings = 132;
+  let pingGap = 10;
+  
+
+  // check if counter is between any of the triplePingEnable ranges
+  enableTriplePing = triplePingEnable.some((range) => {
+    return counter > range[0] && counter < range[1];
+  });
+
+  if(enableTriplePing){
+    if( (counter - triplePingDelay) % timeBetweenPings <= 2){
+      word1opacity = 255;
+    } else if( (counter - triplePingDelay - pingGap) % timeBetweenPings <= 2){
+      word2opacity = 255;
+    } else if( (counter - triplePingDelay - pingGap*2) % timeBetweenPings <= 2){
+      word3opacity = 255;
+    } else {
+      triplePing = -1;
+      word1opacity--;
+      word2opacity--;
+      word3opacity--;
+    }
+  } else {
+    // slowly bring all opacities back to 200
+    word1opacity += (200 - word1opacity)/100;
+    word2opacity += (200 - word2opacity)/100;
+    word3opacity += (200 - word3opacity)/100;
+  }
+
+
+  let metalPingDelay = 72;
+  let metalPingGap = 264; // 264
+
+
+  // if(metalPingEnable.some((range) => {
+  //   return counter > range[0] && counter < range[1]})){
+  //     console.log("ping on");
+  //   } else {
+  //     console.log("ping off");
+  //   }
+
+
+  
+  if(
+    metalPingEnable.some((range) => {
+      return counter > range[0] && counter < range[1]}) &&
+    (counter - metalPingDelay) % metalPingGap <= 2){
+    timeSincePing = 0;
+  } else {
+    timeSincePing += 2;
+  }
+
+
+
+
+}
+
+
 function drawPlanet(bass, counter) {
+
+  let bassAmount = bass/5;
+    if(bass > 80){
+      bassAmount += sin(counter*1.5)*5;
+    }
+
+
   noStroke();
   const planetSize = 190;
   push();
@@ -143,7 +220,7 @@ function drawPlanet(bass, counter) {
   push();
     radialGradient(-planetSize / 2, -planetSize / 1.5, 0,
       -planetSize / 2, -planetSize / 1.5, planetSize * 1.3, color(200), color(0));
-    circle(0, 0, planetSize - (bass/5));
+    circle(0, 0, planetSize - (bass/5) + bassAmount/10);
   pop();
 
 
@@ -153,10 +230,7 @@ function drawPlanet(bass, counter) {
     noFill();
     stroke(200);
     strokeWeight(15);
-    let bassAmount = bass/5;
-    if(bass > 80){
-      bassAmount += sin(counter)*5;
-    }
+    
     ellipse(0, 0, planetSize * 1.65 + bassAmount, planetSize * 0.4  + bassAmount/2);
   pop();
 
@@ -167,7 +241,7 @@ function drawPlanet(bass, counter) {
     fill(255);
     radialGradient(-planetSize / 2, -planetSize / 1.5, 0,
     -planetSize / 2, -planetSize / 1.5, planetSize * 1.3, color(200), color(0));
-    arc(0, 0, planetSize - (bass/5), planetSize - (bass/5),  PI, PI *2, CHORD);
+    arc(0, 0, planetSize - (bass/5) + bassAmount/10, planetSize - (bass/5) + bassAmount/10,  PI, PI *2, CHORD);
   pop();
 
 
@@ -201,6 +275,18 @@ function drawShip(vocal, bass) {
   });
   pop();
   
+  // draw metal ping radar
+  if(timeSincePing < 255){
+    push();
+    translate(width * 0.5 + 80, height * 0.5 - 50);
+    // replace with circle that has white edge and fades to clear in middle later
+    noFill();
+    stroke(255, 255, 255, 255 - timeSincePing);
+    strokeWeight(2);
+    circle(0, 0, timeSincePing*2);
+    
+    pop();
+  }
   
   push();
     translate(width * 0.5 + 80 + shakeX, height * 0.5 - 50 + shakeY);
@@ -211,11 +297,14 @@ function drawShip(vocal, bass) {
 
   // draw ship glow
   push();
-  radialGradient(width / 2 + 80, height / 2, (vocal * 2), width / 2 + 80, height / 2, vocal * 4 + 110 + bass*2, color(0, 0, 0, 0), color(0, 0, 0, 250));
-  // radialGradient(width / 2, height / 2, (vocal * 2) + 20, width / 2, height / 2, vocal * 4 + 250, color(0, 0, 0, 0), color(0, 0, 0, 250));
+  let outerRadius = map(vocal*3 + bass*3, 0, 600, 110, width);
+  radialGradient(width / 2 + 80, height / 2, (vocal * 2), 
+  width / 2 + 80, height / 2, outerRadius,
+  color(0, 0, 0, 0), color(0, 0, 0, 250));
   rect(0, 0, width, height);
   pop();
-
+  
+  // radialGradient(width / 2, height / 2, (vocal * 2) + 20, width / 2, height / 2, vocal * 4 + 250, color(0, 0, 0, 0), color(0, 0, 0, 250));
 
   
   // flames.forEach((flame) => {
@@ -235,11 +324,15 @@ function drawAlbumCovertItems() {
   textFont('Lexend');
   textStyle(BOLD);
   textSize(width / 10);
+  fill(255, 255, 255, word2opacity);
   text("SPACE CADET", left, top + width / 20);
+  
   textSize(width / 40);
   let gap = 10;
+  fill(255, 255, 255, word1opacity);
   text("METRO BOOMIN", left, top + width / 20 + gap + width / 40);
   textAlign(RIGHT);
+  fill(255, 255, 255, word3opacity);
   text("GUNNA", width * 0.76, top + width / 20 + gap + width / 40);
 
   // draw image
