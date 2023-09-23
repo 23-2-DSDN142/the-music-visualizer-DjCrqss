@@ -140,7 +140,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
 }
 
 
-const maxTime = 1.2 * Math.PI;
+const maxTime = 2 * Math.PI;
 function setUp() {
   //getnerate stars, flames and asteroids
   for (let i = 0; i < 100; i++) {
