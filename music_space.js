@@ -281,7 +281,7 @@ function drawShip(vocal, bass) {
     translate(width * 0.5 + 80, height * 0.5 - 50);
     // replace with circle that has white edge and fades to clear in middle later
     noFill();
-    stroke(255, 255, 255, 255 - timeSincePing);
+    stroke(255, 255, 255, 240 - timeSincePing);
     strokeWeight(2);
     circle(0, 0, timeSincePing*2);
     
