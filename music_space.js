@@ -121,7 +121,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   } else if (other > 78) {
     other = 78;
   }
-  let mappedOther = map(other, 62, 78, 0.001, 0.03);
+  let mappedOther = map(other, 62, 78, 0.001, 0.01);
   asteroids.forEach((asteroid) => {
     asteroid.update(mappedOther).display();
   });
@@ -457,8 +457,8 @@ class Flame {
 const asteroidBeltX = 1300;
 const asteroidBeltY = 700;
 const asteroidBeltRad = 500;
-const maxAsteroidSize = 10;
-const minAsteroidSize = 2;
+const maxAsteroidSize = 8;
+const minAsteroidSize = 0.1;
 const minAsteroidSpread = -40;
 const maxAsteroidSpread = 40;
 class Asteroid {
@@ -469,11 +469,15 @@ class Asteroid {
     this.size = random(minAsteroidSize, maxAsteroidSize);
     
     // create vertices array for a blob
-    this.vertices = [random(1, 3), -this.size / random(1, 3),
-    this.size / random(1, 3), random(1, 3),
-    this.size / random(1, 3), this.size / random(1, 3),
-    -this.size / random(1, 3), this.size / random(1, 3),
-    -this.size / random(1, 3), random(1, 3)];
+    this.vertices = [];
+    let numVertices = random(4, 8);
+    for(let corner = 0; corner < numVertices; corner++){
+      let angle = corner * TWO_PI / numVertices;
+      let x = this.size * cos(angle) + random(-this.size / 4, this.size / 4);
+      let y = this.size * sin(angle) + random(-this.size / 4, this.size / 4);
+      this.vertices.push(x);
+      this.vertices.push(y);
+    }
 
   }
 
