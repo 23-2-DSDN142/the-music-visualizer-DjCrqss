@@ -106,6 +106,10 @@ function setup() {
       volumes[i] = Taira.smoothen(volumes[i], Taira.ALGORITHMS.GAUSSIAN, 10, radius, true)
     }
   }
+
+  // smooth just the 'Other' channel
+  let radius = map(500, 0, 100, 0, 3);
+  volumes[3] = Taira.smoothen(volumes[3], Taira.ALGORITHMS.GAUSSIAN, 10, radius, true)
 }
 
 function switchRunMode() {
