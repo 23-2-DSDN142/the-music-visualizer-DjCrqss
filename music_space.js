@@ -39,11 +39,30 @@ class Star {
       this.framesSinceChange = random(60, 400);
     }
 
+
+    push()
     if (this.changeSize) {
       star(this.x, this.y, this.size * sizeMod, this.size * sizeMod * 0.25, points);
+      // this.drawStarGlow(sizeMod);
+
     } else {
       star(this.x, this.y, this.size * 0.4, this.size * 0.1, points);
+      // this.drawStarGlow(sizeMod);
+     
     }
+    pop();
+  }
+
+  drawStarGlow(sizeMod){
+    push();
+    noStroke();
+    // make overlay style ADD
+    blendMode(ADD);
+    radialGradient(this.x, this.y, 0,
+      this.x, this.y, this.size * sizeMod * 20, color(255, 255, 255, 3), color(0, 0, 0, 0));
+    circle(this.x, this.y, this.size * sizeMod * 25 + 100);
+    pop();
+
   }
 
   move() {
@@ -128,6 +147,11 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
 
   // draw ship and glow
   drawShip(vocal, bass);
+
+  stars.forEach((star) => {
+    star.drawStarGlow(starSize);
+  });
+
 
   // draw album cover items
   drawAlbumCovertItems();
@@ -231,7 +255,9 @@ function drawPlanet(bass, counter) {
 
   let bassAmount = bass / 5;
   if (bass > 80) {
-    bassAmount += sin(counter * 1.5) * 5;
+    bassAmount += sin(counter * 1.5) * 5 + 2;
+  } else {
+    bassAmount -= 2;
   }
 
 
@@ -322,7 +348,7 @@ function drawShip(vocal, bass) {
   // draw ship glow
   push();
   let outerRadius = map(vocal * 3 + bass * 3, 0, 600, 110, width);
-  radialGradient(width / 2 + 80, height / 2, (vocal * 2),
+  radialGradient(width / 2 + 80, height / 2, 0,
     width / 2 + 80, height / 2, outerRadius,
     color(0, 0, 0, 0), color(0, 0, 0, 250));
   rect(0, 0, width, height);
@@ -385,7 +411,7 @@ function radialGradient(sX, sY, sR, eX, eY, eR, colorS, colorE, colorM) {
     sX, sY, sR, eX, eY, eR
   );
   gradient.addColorStop(0, colorS);
-  if(colorM){
+  if (colorM) {
     gradient.addColorStop(0.5, colorM);
   }
   gradient.addColorStop(1, colorE);
@@ -412,7 +438,7 @@ class Flame {
     this.radius = this.startRadius;
     this.pos = createVector((random(-vocalSpread, vocalSpread) - 4), 0);
     this.vel = createVector();
-    this.lightness = random(150, 255);
+    this.lightness = random(200, 255);
     this.startAlpha = random(0, 5) + vocalSpread / 5;
     this.decayRate = 0.1;
     this.startLife = 6;
@@ -467,11 +493,11 @@ class Asteroid {
     this.time = initialTime;
     this.rotation = random(0, TWO_PI);
     this.size = random(minAsteroidSize, maxAsteroidSize);
-    
+
     // create vertices array for a blob
     this.vertices = [];
     let numVertices = random(4, 8);
-    for(let corner = 0; corner < numVertices; corner++){
+    for (let corner = 0; corner < numVertices; corner++) {
       let angle = corner * TWO_PI / numVertices;
       let x = this.size * cos(angle) + random(-this.size / 4, this.size / 4);
       let y = this.size * sin(angle) + random(-this.size / 4, this.size / 4);
