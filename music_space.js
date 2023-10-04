@@ -15,24 +15,14 @@ class Star {
     this.framesSinceChange = Math.random() * 400;
   }
   draw() {
-    fill(255, 255, 255, 255);
+    fill(227, 176, 48);
     ellipse(this.x, this.y, this.size, this.size);
   }
   drawSized(sizeMod, points) {
-    fill(255, 255, 255, 255);
+    fill(255, 208, 89);
     stroke(0, 0, 0, 40);
 
-    // if(this.framesSinceChange <= 0){
-
-    //     if(sizeMod > 0.3 && Math.random() > 0.5 && !this.changeSize){
-    //       this.changeSize = true;
-    //       this.framesSinceChange = 60;
-    //     } else if (sizeMod < 0.3 && Math.random() > 0.4 && this.changeSize){
-    //       this.changeSize = false;
-    //       this.framesSinceChange = 400;
-    //     }
-
-    // }
+    // change size every so often
     this.framesSinceChange--;
     if (this.framesSinceChange <= 0) {
       this.changeSize = !this.changeSize;
@@ -43,12 +33,8 @@ class Star {
     push()
     if (this.changeSize) {
       star(this.x, this.y, this.size * sizeMod, this.size * sizeMod * 0.25, points);
-      // this.drawStarGlow(sizeMod);
-
     } else {
       star(this.x, this.y, this.size * 0.4, this.size * 0.1, points);
-      // this.drawStarGlow(sizeMod);
-     
     }
     pop();
   }
@@ -59,7 +45,7 @@ class Star {
     // make overlay style ADD
     blendMode(ADD);
     radialGradient(this.x, this.y, 0,
-      this.x, this.y, this.size * sizeMod * 20, color(255, 255, 255, 3), color(0, 0, 0, 0));
+      this.x, this.y, this.size * sizeMod * 20, color(255, 208, 89, 3), color(0, 0, 0, 0));
     circle(this.x, this.y, this.size * sizeMod * 25 + 100);
     pop();
 
@@ -268,8 +254,8 @@ function drawPlanet(bass, counter) {
 
   // bottom layer
   push();
-  radialGradient(-planetSize / 2, -planetSize / 1.5, 0,
-    -planetSize / 2, -planetSize / 1.5, planetSize * 1.3, color(200), color(0));
+  radialGradient(-planetSize / 2, -planetSize / 1.5, planetSize/2,
+    -planetSize / 2, -planetSize / 1.5, planetSize * 1.3, color(227, 176, 48), color(0,0,0), color(63, 41, 207));
   circle(0, 0, planetSize - (bass / 5) + bassAmount / 10);
   pop();
 
@@ -278,7 +264,7 @@ function drawPlanet(bass, counter) {
   push();
   rotate(sin(counter / 300 - 2) / 4);
   noFill();
-  stroke(200);
+  stroke(138, 125, 227);
   strokeWeight(15);
 
   ellipse(0, 0, planetSize * 1.65 + bassAmount, planetSize * 0.4 + bassAmount / 2);
@@ -289,8 +275,8 @@ function drawPlanet(bass, counter) {
   push();
   noStroke();
   fill(255);
-  radialGradient(-planetSize / 2, -planetSize / 1.5, 0,
-    -planetSize / 2, -planetSize / 1.5, planetSize * 1.3, color(200), color(0));
+  radialGradient(-planetSize / 2, -planetSize / 1.5, planetSize/2,
+    -planetSize / 2, -planetSize / 1.5, planetSize * 1.3, color(227, 176, 48), color(0,0,0),  color(63, 41, 207));
   arc(0, 0, planetSize - (bass / 5) + bassAmount / 10, planetSize - (bass / 5) + bassAmount / 10, PI, PI * 2, CHORD);
   pop();
 
@@ -462,7 +448,9 @@ class Flame {
 
   display() {
     push();
-    fill(this.lightness, this.lightness, this.lightness, Math.min(this.opacity * 5 + this.startAlpha, this.life * 10));
+    colorMode(HSL, 255);
+    fill(30, 255, this.lightness * 0.7, Math.min(this.opacity * 5 + this.startAlpha, this.life * 10));
+    colorMode(RGB);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.radius);
     pop();
@@ -528,7 +516,8 @@ class Asteroid {
       0.5 * tan(this.time) * (this.offset + asteroidBeltRad) + asteroidBeltY);
     rotate(this.rotation);
     imageMode(CENTER);
-    fill(255, 255, 255, map(Math.abs(this.offset), 0, maxAsteroidSpread, 255, 0));
+    fill(138, 125, 227, map(Math.abs(this.offset), 0, maxAsteroidSpread, 255, 0));
+    
 
     // draw shape from vertices
     beginShape();
