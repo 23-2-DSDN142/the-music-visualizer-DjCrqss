@@ -222,7 +222,7 @@ function setExtraSounds(counter) {
   }
 
 
-  let metalPingDelay = 65;
+  let metalPingDelay = 55;
   let metalPingGap = 264; // 264
 
 
