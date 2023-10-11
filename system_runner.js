@@ -1,5 +1,5 @@
-const canvasWidth = 540;
-const canvasHeight = 960;
+const canvasWidth = 800;
+const canvasHeight = 800;
 
 
 let mainCanvas;
@@ -40,9 +40,13 @@ function songLoadedSoFar(soFar) {
   print(songButton.elt.innerHTML);
 }
 
+let sticker;
+let rocketship;
 function preload() {
   table = loadTable('volumes.csv', 'csv');
   words = loadStrings('words.txt');
+  sticker = loadImage('img/Parental-Advisory-logo.png');
+  rocketship = loadImage('img/rocketship.png');
 }
 
 let volumes = [];
@@ -54,7 +58,7 @@ function setup() {
   song = loadSound('song.mp3', songLoaded, songLoadedError, songLoadedSoFar);  
   
   frameRate(60);
-  angleMode(DEGREES);
+  // angleMode(DEGREES);
 
   // create text inputs
   textInput = createInput('words...');
@@ -102,6 +106,10 @@ function setup() {
       volumes[i] = Taira.smoothen(volumes[i], Taira.ALGORITHMS.GAUSSIAN, 10, radius, true)
     }
   }
+
+  // smooth just the 'Other' channel
+  let radius = map(500, 0, 100, 0, 3);
+  volumes[3] = Taira.smoothen(volumes[3], Taira.ALGORITHMS.GAUSSIAN, 10, radius, true)
 }
 
 function switchRunMode() {
